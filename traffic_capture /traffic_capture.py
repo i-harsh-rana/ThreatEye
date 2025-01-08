@@ -13,18 +13,18 @@ def validate_ip(ip):
 
 def process_packet(packet):
     try:
-        src_ip = packet[0][1].src if packet.haslayer('IP') else "Unknown"
-        dst_ip = packet[0][1].dst if packet.haslayer('IP') else "Unknown"
+        src_ip = packet[0][1].src if packet.haslayer("IP") or packet.haslayer("IPv6") else "Unknown"
+        dst_ip = packet[0][1].dst if packet.haslayer("IP") or packet.haslayer("IPv6") else "Unknown"
         
         if not validate_ip(src_ip):
-            src_ip = "0.0.0.0"
+            src_ip = "Unknown"
         if not validate_ip(dst_ip):
-            dst_ip = "0.0.0.0"
+            dst_ip = "Unknown"
 
         protocol = "Other"
-        if packet.haslayer('TCP'):
+        if packet.haslayer("TCP"):
             protocol = "TCP"
-        elif packet.haslayer('UDP'):
+        elif packet.haslayer("UDP"):
             protocol = "UDP"
 
         packet_size = len(packet)
@@ -33,7 +33,7 @@ def process_packet(packet):
             "srcIP": src_ip,
             "dstIP": dst_ip,
             "protocol": protocol,
-            "packetSize": packet_size
+            "packetSize": packet_size,
         }
 
         print(f"Captured Packet: {traffic_log}")
@@ -48,9 +48,6 @@ def process_packet(packet):
         print(f"Error processing packet: {e}")
 
 def start_sniffing(interface):
-    """
-    Start sniffing network traffic on the given interface.
-    """
     print(f"Sniffing on interface: {interface}")
     try:
         sniff(iface=interface, prn=process_packet, store=False)
@@ -58,5 +55,5 @@ def start_sniffing(interface):
         print(f"Error starting sniffing: {e}")
 
 if __name__ == "__main__":
-    network_interface = "en0"  
+    network_interface = "en0" 
     start_sniffing(network_interface)
