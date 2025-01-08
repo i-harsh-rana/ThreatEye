@@ -4,12 +4,26 @@ const trafficLogSchema = new Schema({
     srcIP: {
         type: String,
         required: true,
-        match: /^(\d{1,3}\.){3}\d{1,3}$/, 
+        validate: {
+            validator: function (v) {
+                const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(\1\.\1\.\1)$/i;
+                const ipv6Regex = /^([a-fA-F0-9:]+:+)+[a-fA-F0-9]+$/;
+                return v === 'Unknown' || ipv4Regex.test(v) || ipv6Regex.test(v);
+            },
+            message: (props) => `${props.value} is not a valid IP address!`
+        }
     },
     dstIP: {
         type: String,
         required: true,
-        match: /^(\d{1,3}\.){3}\d{1,3}$/, 
+        validate: {
+            validator: function (v) {
+                const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(\1\.\1\.\1)$/i;
+                const ipv6Regex = /^([a-fA-F0-9:]+:+)+[a-fA-F0-9]+$/;
+                return v === 'Unknown' || ipv4Regex.test(v) || ipv6Regex.test(v);
+            },
+            message: (props) => `${props.value} is not a valid IP address!`
+        }
     },
     protocol: {
         type: String,
@@ -20,10 +34,6 @@ const trafficLogSchema = new Schema({
         type: Number,
         required: true,
         min: 0,  // Ensures packetSize cannot be negative
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now,
     },
     prediction: {
         type: String,
